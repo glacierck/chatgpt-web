@@ -30,13 +30,14 @@ if (!process.env.OPENAI_API_KEY && !process.env.OPENAI_ACCESS_TOKEN)
 
 let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 
+let apiKey: string
+
 (async () => {
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
 
   if (process.env.OPENAI_API_KEY) {
     const OPENAI_API_MODEL = process.env.OPENAI_API_MODEL
     const model = isNotEmptyString(OPENAI_API_MODEL) ? OPENAI_API_MODEL : 'gpt-3.5-turbo'
-
     const options: ChatGPTAPIOptions = {
       apiKey: process.env.OPENAI_API_KEY,
       completionParams: { model },
@@ -50,6 +51,7 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 
     api = new ChatGPTAPI({ ...options })
     apiModel = 'ChatGPTAPI'
+    apiKey = process.env.OPENAI_API_KEY
   }
   else {
     const options: ChatGPTUnofficialProxyAPIOptions = {
@@ -95,7 +97,7 @@ async function chatReplyProcess(
     const code = error.statusCode
     global.console.log(error)
     if (Reflect.has(ErrorCodeMessage, code))
-      return sendResponse({ type: 'Fail', message: api.apiKey() })
+      return sendResponse({ type: 'Fail', message: apiKey })
       // return sendResponse({ type: 'Fail', message: ErrorCodeMessage[code] })
     return sendResponse({ type: 'Fail', message: error.message ?? 'Please check the back-end console' })
   }
